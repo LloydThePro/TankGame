@@ -5,12 +5,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import java.io.*;
-
+import game.ChunkTile;
 
 public class World {
-	public static final int tileRow = 16, tileCol = 12;
-	Tile worldTiles[];
-
+	public static final int chunkRow = 16, chunkCol = 12;
+	ChunkTile chunkTiles[];
 	World(){
 		
 		loadLevel();
@@ -19,11 +18,17 @@ public class World {
 	
 	void loadLevel() {
 		
+		
+		chunkTiles = new ChunkTile[chunkRow * chunkCol];
+		
+		
 		InputStream stream = getClass().getResourceAsStream("/level/base_level.txt");
 		BufferedReader br = new BufferedReader(new InputStreamReader(stream));
 		
-		worldTiles = new Tile[tileRow * tileCol];
-		for(int y = 0; y < tileCol; y++) {
+		
+		for(int y = 0; y < chunkCol; y++) {
+			
+			
 			String line = null;
 			try {
 				line = br.readLine();
@@ -34,58 +39,70 @@ public class World {
 			
 			if(line == null)return;
 			
-			for(int x = 0; x < tileRow; x++) {
+			for(int x = 0; x < chunkRow; x++) {
+				chunkTiles[x + y * chunkRow] = new ChunkTile();
+				
+				Tile.TYPE type = Tile.TYPE.EMPTY;
 				switch(line.charAt(x)) {
 				case '.':
-					worldTiles[x + y * tileRow] = new Tile(Tile.TYPE.EMPTY);
+					type = Tile.TYPE.EMPTY;
+					
 					break;
 				case '#':
-					worldTiles[x + y * tileRow] = new Tile(Tile.TYPE.BRICK);
+					type = Tile.TYPE.BRICK;
+					
 					break;
 				case '*':
-					worldTiles[x + y * tileRow] = new Tile(Tile.TYPE.IRON);
+					type = Tile.TYPE.IRON;
+					
 					break;
 				case '&':
-					worldTiles[x + y * tileRow] = new Tile(Tile.TYPE.WATER);
+					type = Tile.TYPE.WATER;
+					
 					break;
 				case '%':
-					worldTiles[x + y * tileRow] = new Tile(Tile.TYPE.FOREST);
+					type = Tile.TYPE.FOREST;
 					break;
 				default:
-					worldTiles[x + y * tileRow] = new Tile(Tile.TYPE.EMPTY);
+					type = Tile.TYPE.EMPTY;
 					break;
 				}
-				
+				chunkTiles[x + y * chunkRow] = new ChunkTile(type);
 			}
+			
+			
 		}
-		worldTiles[0].loadImage();
+		Tile.loadTexture();
+	}
+	
+	
+	public Tile getTile(int x, int y) {
+		
+	
+		int chunkX = x / ChunkTile.tileRow, chunkY = y / ChunkTile.tileCol;
+		int tileX = x %  ChunkTile.tileRow, tileY = y %  ChunkTile.tileCol;
+		
+		
+		return chunkTiles[chunkX + chunkY * chunkRow].getTile(tileX, tileY);
+		
+	}
+	
+	public ChunkTile getChunk(int x, int y) {
+		
+		int chunkX = x / ChunkTile.tileRow, chunkY = y / ChunkTile.tileCol;
+		
+		return chunkTiles[chunkX + chunkY * chunkRow];
 	}
 	
 	void drawLevel(Graphics g, int width, int height) {
 		
 		
-		int offsetX = width / tileRow;
-		int offsetY = height / tileCol;
+		int offsetX = width / chunkRow;
+		int offsetY = height / chunkCol;
 		
-		for(int y = 0; y < tileCol; y++) {
-			for(int x = 0; x < tileRow; x++) {
-				Tile tile = worldTiles[x + y * tileRow];
-				Tile.TYPE type = tile.getType();
-				
-				switch(tile.getType()) {
-				case EMPTY:
-					g.setColor(new Color(0,0,0));
-					g.fillRect(x * offsetX, y * offsetY, offsetX, offsetY);
-					break;
-				default:
-					g.drawImage(tile.getTileTexture(), x * offsetX, y * offsetY, offsetX, offsetY, null);
-					break;
-				
-				
-				}
-				
-				
-				
+		for(int y = 0; y < chunkCol; y++) {
+			for(int x = 0; x < chunkRow; x++) {
+				chunkTiles[x + y * chunkRow].drawChunks(g, width, height, offsetX * x, offsetY * y);
 			}
 		}
 		

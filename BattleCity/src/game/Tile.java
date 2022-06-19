@@ -52,7 +52,11 @@ public class Tile {
 		return tileType;
 	}
 	
-	public void loadImage() {
+	public static void loadTexture() {
+		new Tile().loadImage();
+	}
+	
+	private void loadImage() {
 		
 		
 		try {

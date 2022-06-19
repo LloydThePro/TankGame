@@ -19,6 +19,7 @@ public class BattleCity {
 		frame.setLocationRelativeTo(null);
 		frame.add(display);
 		frame.pack();
+		frame.addMouseListener(display.ms);
 		frame.addKeyListener(display);
 		display.updateLoop();
 	}

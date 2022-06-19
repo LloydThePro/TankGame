@@ -8,78 +8,99 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-
-public class Tank{
+import game.Entity;
+public class Tank extends Entity{
 	
-	private static final int width = 45, height = 45;
-	public float xPos = 50.0f, yPos = 50.0f;
-	private BufferedImage texture[];
-	private float fSpeed = 6f;
 	public static enum DIR{
 		UP, DOWN, LEFT, RIGTH
 	};
-	private DIR currentDir;
+	
+	public int prevX, prevY;
+	private static int textureWidth, textureHeight;
+	
 	Tank(){
-		currentDir = DIR.UP;
+		
+		
+		
+		yPos = 100;
+		xPos = 100;
+		prevX = xPos;
+		prevY = yPos;
+		
+		entTypeID = 1;
+		textureWidth = GameDisplay.width / World.chunkRow;
+		textureHeight = GameDisplay.height / World.chunkCol;
+		
+		width = (int) ((GameDisplay.width / World.chunkRow) * 0.75);
+		height =(int) ((GameDisplay.height / World.chunkCol) * 0.75);
+		
+		
+		
+		
+		currentDir = Entity.DIR.UP;
 		texture = new BufferedImage[4];
 	}
 	
 	
-	public void moveTank(DIR dir) {
-		
+	public void moveTank(Entity.DIR dir) {
+		prevX = xPos;
+		prevY = yPos;
 		currentDir = dir;
 		switch(dir) {
 		case UP:
-			yPos -= fSpeed;
+			yPos -= speed;
 			break;
 		case DOWN:
-			yPos += fSpeed;
+			yPos += speed;
 			break;
 		case LEFT:
-			xPos -= fSpeed;
+			xPos -= speed;
 			break;
 		case RIGTH:
-			xPos += fSpeed;
+			xPos += speed;
 			break;
 		}
+		
+		
 	}
 	
-	public void drawTank(Graphics g) {
+	public void draw(Graphics g, int width, int height) {
+		
+		int offsetX = (int)(textureWidth * 0.25) / 2;
+		int offsetY = (int)(textureHeight * 0.25) / 2;
 		
 		switch(currentDir) {
 		case UP:
-			g.drawImage(texture[0],(int)xPos, (int)yPos, 50, 50, null);
+			g.drawImage(texture[0],(int)xPos - offsetX, (int)yPos - offsetY, textureWidth, textureHeight, null);
 			break;
 		case DOWN:
-			g.drawImage(texture[1],(int)xPos, (int)yPos, 50, 50, null);
+			g.drawImage(texture[1],(int)xPos - offsetX, (int)yPos - offsetY, textureWidth, textureHeight, null);
 			break;
 		case LEFT:
-			g.drawImage(texture[2],(int)xPos, (int)yPos, 50, 50, null);
+			g.drawImage(texture[2],(int)xPos - offsetX, (int)yPos - offsetY, textureWidth, textureHeight, null);
 			break;
 		case RIGTH:
-			g.drawImage(texture[3],(int)xPos, (int)yPos, 50, 50, null);
+			g.drawImage(texture[3],(int)xPos - offsetX, (int)yPos - offsetY, textureWidth, textureHeight, null);
 			break;
 		}
-		
-		//g.drawImage(texture,(int)xPos, (int)yPos, 50, 50, null);
 	}
 	
-	public void loadImage() {
+	public static void loadImage() {
 		try {
-			texture[0] = ImageIO.read(getClass().getResource("/assets/tank.png"));
-			texture[1] = ImageIO.read(getClass().getResource("/assets/tank_down.png"));
-			texture[2] = ImageIO.read(getClass().getResource("/assets/tank_left.png"));
-			texture[3] = ImageIO.read(getClass().getResource("/assets/tank_right.png"));
+			Tank tank = new Tank();
+			
+			texture[0] = ImageIO.read(tank.getClass().getResource("/assets/tank.png"));
+			texture[1] = ImageIO.read(tank.getClass().getResource("/assets/tank_down.png"));
+			texture[2] = ImageIO.read(tank.getClass().getResource("/assets/tank_left.png"));
+			texture[3] = ImageIO.read(tank.getClass().getResource("/assets/tank_right.png"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 	}
 	
 	
-	public void shootTank() {
-		
-	}
+	
 
 	
 	
